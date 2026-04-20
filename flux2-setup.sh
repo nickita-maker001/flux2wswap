@@ -5,7 +5,7 @@ source /venv/main/bin/activate 2>/dev/null || true
 WORKSPACE=${WORKSPACE:-/workspace}
 COMFYUI_DIR="${WORKSPACE}/ComfyUI"
 
-echo "=== FLUX.2-klein-9B FP8 + Qwen3-8B FP8 + ComfyUI 0.19.3 ==="
+echo "=== FLUX.2-klein-9B FULL + Qwen3-8B FP8 + ComfyUI 0.19.3 ==="
 
 # === CUSTOM NODES (из воркфлоу) ===
 NODES=(
@@ -34,8 +34,7 @@ VAE_DIR="${COMFYUI_DIR}/models/vae"
 LLM_DIR="${COMFYUI_DIR}/models/LLM"
 
 # === МОДЕЛИ: Ссылки (официальные, с поддержкой авторизации) ===
-# 🔹 Диффузионная модель: пробует FP8, fallback на full
-FLUX_FP8_URL="https://huggingface.co/black-forest-labs/FLUX.2-klein-9B/resolve/main/flux-2-klein-9b-fp8.safetensors"
+# 🔹 Диффузионная модель: полная версия (без FP8 fallback)
 FLUX_FULL_URL="https://huggingface.co/black-forest-labs/FLUX.2-klein-9B/resolve/main/flux-2-klein-9b.safetensors"
 
 # 🔹 Текстовый энкодер: Qwen3-8B FP8 mixed (официальный от Comfy-Org)
@@ -140,11 +139,8 @@ clone_comfyui_if_needed
 install_extra_pip
 install_nodes
 
-echo "📦 Downloading FLUX.2-klein-9B (FP8 preferred)..."
-download_with_fallback \
-    "${DIFFUSION_DIR}/flux-2-klein-9b-fp8.safetensors" \
-    "$FLUX_FP8_URL" \
-    "$FLUX_FULL_URL"
+echo "📦 Downloading FLUX.2-klein-9B (FULL version)..."
+download_with_auth "${DIFFUSION_DIR}" "$FLUX_FULL_URL"
 
 echo "📦 Downloading Qwen3-8B text encoder (FP8 mixed preferred)..."
 download_with_fallback \
@@ -167,7 +163,7 @@ fi
 echo ""
 echo "✅ Provisioning complete!"
 echo "📁 Model paths:"
-echo "   • Diffusion: ${DIFFUSION_DIR}/flux-2-klein-9b-fp8.safetensors"
+echo "   • Diffusion: ${DIFFUSION_DIR}/flux-2-klein-9b.safetensors"
 echo "   • Text Encoder: ${TEXT_ENCODERS_DIR}/qwen_3_8b_fp8mixed.safetensors"
 echo "   • VAE: ${VAE_DIR}/flux2-vae.safetensors"
 echo "   • LLM (optional): ${LLM_DIR}/Qwen3-8B-heretic-GGUF/"
